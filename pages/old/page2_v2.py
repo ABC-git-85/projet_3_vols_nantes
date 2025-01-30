@@ -77,50 +77,46 @@ with col2:
     fig.update_layout(title={'font': {'size': 20}}, xaxis_title='', annotations=annotations)
     st.plotly_chart(fig)
 
-# Évolution du trafic aérien en France par jour (2016-2024)
-fig = px.line(trafic_aerien_fr, x='FLT_DATE', y='FLT_TOT_1', labels=dict(FLT_TOT_1="Vols", FLT_DATE="Dates"), title="🔵⚪🔴 Évolution du trafic global en France", color_discrete_sequence=px.colors.qualitative.G10)
-fig.update_layout(title={'font': {'size': 20}}, xaxis=dict(showticklabels=False), annotations=annotations)
+# Évolution du trafic aérien en France (2016-2024)
+months = {'1':'Janvier', '2':'Février', '3':'Mars', '4':'Avril', '5':'Mai', '6':'Juin', '7':'Juillet', '8':'Août', '9':'Septembre', '10':'Octobre', '11':'Novembre', '12':'Décembre'}
+
+trafic_aerien_fr_month = trafic_aerien_fr[['MONTH_NUM', 'YEAR', 'FLT_TOT_1']]
+trafic_aerien_fr_month = trafic_aerien_fr_month[trafic_aerien_fr_month['YEAR'] >= 2019]
+trafic_aerien_fr_month = trafic_aerien_fr_month.groupby(["YEAR", "MONTH_NUM"]).sum()
+trafic_aerien_fr_month = trafic_aerien_fr_month.reset_index()
+trafic_aerien_fr_month['MONTH_NAME'] = trafic_aerien_fr_month['MONTH_NUM'].astype(str).map(months)
+trafic_aerien_fr_month = trafic_aerien_fr_month.sort_values(by=["YEAR", "MONTH_NUM"], ascending=[False, True])
+
+unique_years = sorted(trafic_aerien_fr_month['YEAR'].unique())
+num_years = len(unique_years)
+color_scale = px.colors.sequential.Teal[:num_years]
+color_mapping = {year: color for year, color in zip(unique_years, color_scale)}
+fig = px.line(
+    trafic_aerien_fr_month,
+    x='MONTH_NAME',
+    y='FLT_TOT_1',
+    color='YEAR',
+    markers=True,
+    labels=dict(FLT_TOT_1="Vols", MONTH_NAME="Mois", YEAR="Année"),
+    title="🔵⚪🔴 Évolution du trafic global en France au cours des 6 dernières années",
+    color_discrete_map=color_mapping
+)
+fig.for_each_trace(lambda trace: trace.update(line=dict(width=4)) if trace.name == "2024" else trace.update(line=dict(width=2))) # Épaissir la ligne pour l'année 2024
+# Source
+annotations = []
+annotations.append(dict(xref='paper', yref='paper', x=0.5, y=-0.23,
+                            xanchor='center', yanchor='top',
+                            text='Source : © 2024 EUROCONTROL',
+                            font=dict(size=10, color='rgb(150,150,150)'),
+                            showarrow=False))
+fig.update_layout(title={'font': {'size': 20}}, xaxis_title='', annotations=annotations)
 st.plotly_chart(fig)
 
-if "show_graph" not in st.session_state:
-    st.session_state.show_graph = False
 
-# Affichage du bouton pour basculer l'affichage du graphique
-if st.button("Découvrir la saisonnalité des vols ☀️"):
-    # Bascule l'état de show_graph
-    st.session_state.show_graph = not st.session_state.show_graph
+fig = px.line(trafic_aerien_fr, x='FLT_DATE', y='FLT_TOT_1', labels=dict(FLT_TOT_1="Vols", FLT_DATE="Dates"), title="🔵⚪🔴 Évolution du trafic global en France", color_discrete_sequence=px.colors.qualitative.G10)
 
-# Si l'état du graphique est "True", affiche-le
-if st.session_state.show_graph:
-    # Saisonnalité du trafic aérien en France par mois (2016-2024)
-    months = {'1':'Janvier', '2':'Février', '3':'Mars', '4':'Avril', '5':'Mai', '6':'Juin', '7':'Juillet', '8':'Août', '9':'Septembre', '10':'Octobre', '11':'Novembre', '12':'Décembre'}
-
-    trafic_aerien_fr_month = trafic_aerien_fr[['MONTH_NUM', 'YEAR', 'FLT_TOT_1']]
-    trafic_aerien_fr_month = trafic_aerien_fr_month[trafic_aerien_fr_month['YEAR'] > 2018]
-    trafic_aerien_fr_month = trafic_aerien_fr_month.groupby(["YEAR", "MONTH_NUM"]).sum()
-    trafic_aerien_fr_month = trafic_aerien_fr_month.reset_index()
-    trafic_aerien_fr_month['MONTH_NAME'] = trafic_aerien_fr_month['MONTH_NUM'].astype(str).map(months)
-    trafic_aerien_fr_month = trafic_aerien_fr_month.sort_values(by=["YEAR", "MONTH_NUM"], ascending=[False, True])
-
-    fig = px.line(
-        trafic_aerien_fr_month,
-        x='MONTH_NAME',
-        y='FLT_TOT_1',
-        color='YEAR',
-        markers=True,
-        labels=dict(FLT_TOT_1="Vols", MONTH_NAME="Mois", YEAR="Année"),
-        title="☀️ Saisonnalité du trafic en France"
-    )
-    # Source
-    annotations = []
-    annotations.append(dict(xref='paper', yref='paper', x=0.5, y=-0.23,
-                                xanchor='center', yanchor='top',
-                                text='Source : © 2024 EUROCONTROL',
-                                font=dict(size=10, color='rgb(150,150,150)'),
-                                showarrow=False))
-    fig.update_layout(title={'font': {'size': 20}}, xaxis_title='', annotations=annotations)
-    st.plotly_chart(fig)
-    
+fig.update_layout(title={'font': {'size': 20}}, annotations=annotations)
+st.plotly_chart(fig)
 
 ################################### AÉROPORT DE NANTES ###################################
 
@@ -131,33 +127,23 @@ months = {'2':'Février', '3':'Mars', '4':'Avril', '5':'Mai', '6':'Juin', '7':'J
 ### LES COMPAGNIES AÉRIENNES ###
 
 # Présentation de l'évolution du nombre de vols à Nantes en 2024
-df_flight_nantes = trafic_aerien_fr[['APT_NAME', 'MONTH_NUM', 'YEAR', 'FLT_TOT_1']]
-df_flight_nantes = df_flight_nantes[(df_flight_nantes['YEAR'] > 2021) & (df_flight_nantes['APT_NAME'] == 'Nantes-Atlantique')]
-df_flight_nantes = df_flight_nantes.groupby(["APT_NAME", "YEAR", "MONTH_NUM"]).sum()
-df_flight_nantes = df_flight_nantes.reset_index()
-df_flight_nantes['MONTH_NAME'] = df_flight_nantes['MONTH_NUM'].astype(str).map(months)
-df_flight_nantes = df_flight_nantes.sort_values(by=["YEAR", "MONTH_NUM"], ascending=[False, True])
+flights_by_companies_2024_global = flights_by_companies_2024.groupby(["Mois"]).sum().reset_index()
+flights_by_companies_2024_global['Mois_Nom'] = flights_by_companies_2024['Mois'].astype(str).map(months) # Ajouter une colonne 'Mois_Nom' qui contient le nom du mois en français
+flights_by_companies_2024_global['Mois'] = flights_by_companies_2024_global['Mois'].astype(int)
+flights_by_companies_2024_global = flights_by_companies_2024_global.sort_values('Mois')
 
-fig = px.bar(
-    df_flight_nantes,
-    barmode='group',
-    x='MONTH_NAME',
-    y='FLT_TOT_1',
-    color='YEAR',
-    labels={'FLT_TOT_1': "Vols", 'MONTH_NAME': "Mois", 'YEAR':'Année'},
-    title="Évolution du trafic aérien à Nantes par mois et année",
-    text_auto=True,
-    color_discrete_sequence=px.colors.sequential.Teal[::-1]  # Dégradé inversé pour les années
-)
+fig = px.line(flights_by_companies_2024_global, x="Mois_Nom", y="Nombre_Total_Vols", text="Nombre_Total_Vols", labels=dict(Mois_Nom="Mois", Nombre_Total_Vols="Vols"), title="✈️ Trafic aérien en 2024", color_discrete_sequence=px.colors.qualitative.Dark2)
+fig.update_traces(textposition="top right", line=dict(width=3))
 # Source
 annotations = []
 annotations.append(dict(xref='paper', yref='paper', x=0.5, y=-0.23,
                             xanchor='center', yanchor='top',
-                            text='Source : © 2024 EUROCONTROL',
+                            text='Source : Aviation Edge (02/2024 - 12/2024)',
                             font=dict(size=10, color='rgb(150,150,150)'),
                             showarrow=False))
-fig.update_layout(showlegend=False, title={'font': {'size': 20}}, xaxis_title='', bargap=0.15, bargroupgap=0.1, annotations=annotations)
+fig.update_layout(showlegend=False, title={'font': {'size': 20}}, xaxis_title='', annotations=annotations)
 st.plotly_chart(fig)
+
 
 st.markdown("#### 👎 Flop 5 des compagnies aériennes en 2024")
 
@@ -181,7 +167,7 @@ with col1:
     annotations = []
     annotations.append(dict(xref='paper', yref='paper', x=0.5, y=-0.23,
                                 xanchor='center', yanchor='top',
-                                text='Source : Aviation Edge (02/2024 - 12/2024) - Compagnies réalisant plus de 500 vols par an',
+                                text='Source : Aviation Edge (02/2024 - 12/2024)',
                                 font=dict(size=10, color='rgb(150,150,150)'),
                                 showarrow=False))
     fig.update_layout(showlegend=False, title={'font': {'size': 18}}, yaxis_title='', annotations=annotations)
@@ -198,7 +184,7 @@ with col2:
     annotations = []
     annotations.append(dict(xref='paper', yref='paper', x=0.5, y=-0.23,
                                 xanchor='center', yanchor='top',
-                                text='Source : Aviation Edge (02/2024 - 12/2024) - Compagnies réalisant plus de 500 vols par an',
+                                text='Source : Aviation Edge (02/2024 - 12/2024)',
                                 font=dict(size=10, color='rgb(150,150,150)'),
                                 showarrow=False))
     fig.update_layout(showlegend=False, title={'font': {'size': 18}}, yaxis_title='', annotations=annotations)
@@ -217,8 +203,8 @@ col1, spacer, col2 = st.columns([1, 0.2, 1])
 with col1:
     # Présentation des top 5 des compagnies qui réalisent le plus de vols
     flights_by_companies_2024['Mois_Nom'] = flights_by_companies_2024['Mois'].astype(str).map(months) # Ajouter une colonne 'Mois_Nom' qui contient le nom du mois en français
-    flights_by_companies_2024 = flights_by_companies_2024.sort_values(['Mois', 'Nombre_Total_Vols'], ascending=False)    
-    flights_by_companies_2024_choice = flights_by_companies_2024[flights_by_companies_2024["Mois_Nom"] == selected_month]
+    flights_sup_500_by_year_by_companies_2024 = flights_by_companies_2024.sort_values(['Mois', 'Nombre_Total_Vols'], ascending=False)    
+    flights_by_companies_2024_choice = flights_sup_500_by_year_by_companies_2024[flights_sup_500_by_year_by_companies_2024["Mois_Nom"] == selected_month]
     top5_flights_companies = flights_by_companies_2024_choice.head(5)    
     
     fig = px.bar(top5_flights_companies, x="Nombre_Total_Vols", y="Compagnie", color='Compagnie', labels=dict(Nombre_Total_Vols="Vols", Compagnie="Compagnie"), text_auto='.2s', orientation='h', title=f"👍 Top 5 des compagnies aériennes en {selected_month.lower()}", color_discrete_sequence=px.colors.qualitative.Dark2)

@@ -1,15 +1,113 @@
 import streamlit as st
+import qrcode
+from io import BytesIO
 
-st.title("👉 À propos de nous")
+################################ CONF PAGE ################################
 
-st.header("💖 L'équipe")
+st.set_page_config(
+    layout="wide" # Mode wide uniquement pour cette page
+)
 
-st.write("Toto")
-st.write("Toto")
-st.write("Toto")
+###########################################################################
 
-st.header("📖 Sources")
+st.title("💖 L'équipe")
+#st.header("👉 À propos de nous")
 
-st.subheader("À quelle fréquence les données sont-elles mises à jour pour les données en temps réel ?")
-st.write("Pour le suivi de la localisation des vols en direct les données sont mises à jour toutes les 5 minutes environ.")
-st.write("Pour les données de calendrier elles sont mises à jour toutes les 15 minutes environ.")
+# 3 colonnes
+col1, spacer, col2, spacer, col3 = st.columns([1, 0.1, 1, 0.1, 1])
+
+with col1:
+    st.image("images/amandine.png", width=150)
+    st.subheader("Amandine 👋")
+    st.markdown(
+    """
+    <div style="display: flex; gap: 15px; margin-bottom: 20px">
+        <a href="https://www.linkedin.com/in/amandine-bessé-2153b1143" target="_blank">
+            <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" width="25">
+        </a>
+        <a href="https://github.com/ABC-git-85" target="_blank">
+            <svg class="github-icon" width="25" height="25" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M12 0.297C5.372 0.297 0 5.669 0 12.297c0 5.304 3.438 9.801 8.207 11.387.6.111.793-.261.793-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.609-4.042-1.609-.546-1.386-1.333-1.755-1.333-1.755-1.09-.745.083-.729.083-.729 1.204.085 1.838 1.238 1.838 1.238 1.07 1.835 2.805 1.305 3.49.998.107-.774.42-1.305.763-1.605-2.665-.302-5.466-1.332-5.466-5.93 0-1.31.469-2.38 1.236-3.22-.124-.303-.535-1.521.117-3.169 0 0 1.008-.322 3.3 1.23a11.505 11.505 0 013.003-.403c1.02.004 2.046.137 3.003.403 2.292-1.552 3.3-1.23 3.3-1.23.652 1.648.241 2.866.117 3.169.769.84 1.236 1.91 1.236 3.22 0 4.609-2.807 5.625-5.479 5.921.431.372.815 1.103.815 2.222 0 1.605-.015 2.898-.015 3.293 0 .319.192.694.798.576C20.565 22.095 24 17.6 24 12.297c0-6.628-5.372-12-12-12z"/>
+            </svg>
+        </a>
+    </div>
+    """,
+    unsafe_allow_html=True
+    )
+    st.write("Je suis passionnée par l'aviation, et ce site m'a offert l'opportunité de combiner mes intérêts personnels et les compétences acquises lors de ma formation de data analyst. Je suis fière de vous présenter cette application !")
+   
+    cv, qr_code = st.columns([1, 1])
+    with cv:
+        with open("docs/cv_abesse.pdf", "rb") as f:
+            st.download_button(label="Télécharger le CV", data=f, file_name="cv_abesse.pdf", mime="application/pdf")
+    with qr_code:
+        qr = qrcode.make("docs/cv_abesse.pdf")
+        # Conversion de l'image PIL en binaire
+        qr_bytes = BytesIO()
+        qr.save(qr_bytes, format="PNG")  # Sauvegarde en mémoire sous format PNG
+        qr_bytes.seek(0)  # Revenir au début du buffer
+        st.image(qr_bytes, width=100)
+
+with col2:
+    st.image("images/laura.png", width=150)
+    st.subheader("Laura 👍")
+    st.markdown(
+    """
+    <div style="display: flex; gap: 15px; margin-bottom: 20px">
+        <a href="https://www.linkedin.com/in/laura-sébille-4908ba2b" target="_blank">
+            <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" width="25">
+        </a>
+        <a href="https://github.com/Laura4422" target="_blank">
+            <svg class="github-icon" width="25" height="25" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M12 0.297C5.372 0.297 0 5.669 0 12.297c0 5.304 3.438 9.801 8.207 11.387.6.111.793-.261.793-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.609-4.042-1.609-.546-1.386-1.333-1.755-1.333-1.755-1.09-.745.083-.729.083-.729 1.204.085 1.838 1.238 1.838 1.238 1.07 1.835 2.805 1.305 3.49.998.107-.774.42-1.305.763-1.605-2.665-.302-5.466-1.332-5.466-5.93 0-1.31.469-2.38 1.236-3.22-.124-.303-.535-1.521.117-3.169 0 0 1.008-.322 3.3 1.23a11.505 11.505 0 013.003-.403c1.02.004 2.046.137 3.003.403 2.292-1.552 3.3-1.23 3.3-1.23.652 1.648.241 2.866.117 3.169.769.84 1.236 1.91 1.236 3.22 0 4.609-2.807 5.625-5.479 5.921.431.372.815 1.103.815 2.222 0 1.605-.015 2.898-.015 3.293 0 .319.192.694.798.576C20.565 22.095 24 17.6 24 12.297c0-6.628-5.372-12-12-12z"/>
+            </svg>
+        </a>
+    </div>
+    """,
+    unsafe_allow_html=True
+    )
+    st.write("Laura est une spécialiste en gestion de projet, assurant la coordination de l'équipe.")
+
+    cv, qr_code = st.columns([1, 1])
+    with cv:
+        with open("docs/cv_lsebille.pdf", "rb") as f:
+            st.download_button(label="Télécharger le CV", data=f, file_name="cv_lsebille.pdf", mime="application/pdf")
+    with qr_code:
+        qr = qrcode.make("docs/cv_lsebille.pdf")
+        # Conversion de l'image PIL en binaire
+        qr_bytes = BytesIO()
+        qr.save(qr_bytes, format="PNG")  # Sauvegarde en mémoire sous format PNG
+        qr_bytes.seek(0)  # Revenir au début du buffer
+        st.image(qr_bytes, width=100)
+
+with col3:
+    st.image("images/sophie.png", width=150)
+    st.subheader("Sophie 🫶")
+    st.markdown(
+    """
+    <div style="display: flex; gap: 15px; margin-bottom: 20px">
+        <a href="https://www.linkedin.com/in/sophiellch" target="_blank">
+            <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" width="25">
+        </a>
+        <a href="https://github.com/Sophiellch" target="_blank">
+            <svg class="github-icon" width="25" height="25" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M12 0.297C5.372 0.297 0 5.669 0 12.297c0 5.304 3.438 9.801 8.207 11.387.6.111.793-.261.793-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.609-4.042-1.609-.546-1.386-1.333-1.755-1.333-1.755-1.09-.745.083-.729.083-.729 1.204.085 1.838 1.238 1.838 1.238 1.07 1.835 2.805 1.305 3.49.998.107-.774.42-1.305.763-1.605-2.665-.302-5.466-1.332-5.466-5.93 0-1.31.469-2.38 1.236-3.22-.124-.303-.535-1.521.117-3.169 0 0 1.008-.322 3.3 1.23a11.505 11.505 0 013.003-.403c1.02.004 2.046.137 3.003.403 2.292-1.552 3.3-1.23 3.3-1.23.652 1.648.241 2.866.117 3.169.769.84 1.236 1.91 1.236 3.22 0 4.609-2.807 5.625-5.479 5.921.431.372.815 1.103.815 2.222 0 1.605-.015 2.898-.015 3.293 0 .319.192.694.798.576C20.565 22.095 24 17.6 24 12.297c0-6.628-5.372-12-12-12z"/>
+            </svg>
+        </a>
+    </div>
+    """,
+    unsafe_allow_html=True
+    )
+    st.write("Passionnée par l'IA et la data, je développe des solutions innovantes pour analyser et prédire les tendances. Cette application explore les données aériennes avec des modèles de Machine Learning pour offrir des insights pertinents.")
+    
+    cv, qr_code = st.columns([1, 1])
+    with cv:
+        with open("docs/cv_sle_loch.pdf", "rb") as f:
+            st.download_button(label="Télécharger le CV", data=f, file_name="cv_sle_loch.pdf", mime="application/pdf")
+    with qr_code:
+        qr = qrcode.make("docs/cv_sle_loch.pdf")
+        # Conversion de l'image PIL en binaire
+        qr_bytes = BytesIO()
+        qr.save(qr_bytes, format="PNG")  # Sauvegarde en mémoire sous format PNG
+        qr_bytes.seek(0)  # Revenir au début du buffer
+        st.image(qr_bytes, width=100)
