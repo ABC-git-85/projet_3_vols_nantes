@@ -14,6 +14,12 @@
     margin-top: 10px;
 }
 
+/* Couleur primaire sur le site */
+.primary-text {
+    color: #4b58ff;
+    /* La couleur primaire de Streamlit */
+}
+
 /* Centrer l'image dans la colonne 3 */
 .col3-image {
     text-align: right;
@@ -28,4 +34,10 @@
     margin-bottom: 0px;
     font-size: 30px;
     font: bold;
+}
+
+/* Appliquer un filtre blanc sur l'icône GitHub */
+.github-icon {
+    filter: invert(1);
+    /* Inverse les couleurs (le noir devient blanc) */
 }
