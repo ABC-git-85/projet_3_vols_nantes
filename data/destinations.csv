@@ -27,8 +27,8 @@ Madrid,MAD
 Malaga,AGP
 Minorque,MAH
 Palma de Majorque,PMI
-SÃ©ville,SVQ
-TÃ©nÃ©rife,TFS
+Séville,SVQ
+Ténérife,TFS
 Valence,VLC
 Bari,BRI
 Bergame,BGY
@@ -44,24 +44,24 @@ Rome,FCO
 Venise,VCE
 Faro,FAO
 Lisbonne,LIS
-MadÃ¨re,FNC
+Madère,FNC
 Porto,OPO
 Birmingham,BHX
 Bournemouth,BOH
 Bristol,BRS
-Ã‰dimbourg,EDI
+Édimbourg,EDI
 Glasgow,GLA
 Leeds,LBA
 Londres,LHR
 Manchester,MAN
 Berlin,BER
-DÃ¼sseldorf,DUS
+Düsseldorf,DUS
 Francfort,FRA
 Hambourg,HAM
 Munich,MUC
-AthÃ¨nes,ATH
+Athènes,ATH
 Corfou,CFU
-HÃ©raklion,HER
+Héraklion,HER
 Kalamata,KLX
 Kos,KGS
 Mykonos,JMK
@@ -70,7 +70,7 @@ Santorin,JTR
 Agadir,AGA
 Casablanca,CMN
 Essaouira,ESU
-FÃ¨s,FEZ
+Fès,FEZ
 Marrakech,RAK
 Nador,NDR
 Oujda,OUD
@@ -81,7 +81,7 @@ Bruxelles Charleroi,CRL
 Budapest,BUD
 Copenhague,CPH
 Dublin,DUB
-GenÃ¨ve,GVA
+Genève,GVA
 Luxembourg,LUX
 Oslo,OSL
 Prague,PRG
@@ -94,4 +94,31 @@ Hurghada,HRG
 Louxor,LXR
 Tel Aviv,TLV
 Fort-de-France,FDF
-Pointe-Ã -Pitre,PTP
+Pointe-à-Pitre,PTP
+New York,JFK
+Los Angeles,LAX
+Chicago,ORD
+Toronto,YYZ
+Vancouver,YVR
+Tokyo,NRT
+Pékin,PEK
+Shanghai,PVG
+Hong Kong,HKG
+Singapour,SIN
+Sydney,SYD
+Melbourne,MEL
+Dubai,DXB
+Abu Dhabi,AUH
+Johannesburg,JNB
+Le Cap,CPT
+Mumbai,BOM
+Delhi,DEL
+Bangkok,BKK
+Séoul,ICN
+Istanbul,IST
+Moscou,SVO
+São Paulo,GRU
+Rio de Janeiro,GIG
+Buenos Aires,EZE
+Mexico,MEX
+Lima,LIM
