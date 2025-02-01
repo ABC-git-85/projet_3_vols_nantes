@@ -269,11 +269,7 @@ with col2:
     flights_by_hour_2024_choice = flights_by_hour_2024[flights_by_hour_2024["Mois_Nom"] == selected_month] 
     flights_by_hour_2024_choice['degrees'] = flights_by_hour_2024_choice['Heure'].apply(lambda x: x * 15) # Convertir les heures en degrés (chaque heure = 15° => 360° / 24h)
     flights_by_hour_2024_choice = flights_by_hour_2024_choice.sort_values(by=['Type', 'Mois', 'Heure'])
-    fig = px.bar_polar(flights_by_hour_2024_choice, r="Nombre_De_Vols", theta="degrees", color='Type',
-                    template="plotly_dark",
-                    color_discrete_sequence=px.colors.qualitative.Dark2,
-                    title=f"🕟 Vols par tranche horaire en {selected_month.lower()}"
-                    )
+    fig = px.bar_polar(flights_by_hour_2024_choice, r="Nombre_De_Vols", theta="degrees", color='Type', template="plotly_dark", labels=dict(Nombre_De_Vols="Vols", degrees="Heure", Type="Type de vol"), color_discrete_sequence=px.colors.qualitative.Dark2, title=f"🕟 Vols par tranche horaire en {selected_month.lower()}")
     # Source
     annotations = []
     annotations.append(dict(xref='paper', yref='paper', x=0.5, y=-0.23,
