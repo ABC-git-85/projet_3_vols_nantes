@@ -21,7 +21,7 @@ st.set_page_config(
 css_file = 'css/style.css'  # Spécifie le chemin vers ton fichier CSS
 
 # Ajouter un fichier CSS à la carte (ou inclure dans la page HTML)
-with open(css_file, 'r') as file:
+with open(css_file, 'r', encoding='utf-8') as file:
     css = file.read()
 
 # Ajouter le CSS au fichier HTML généré
@@ -73,6 +73,7 @@ def get_weather(city_name):
 ###########################################################################
 
 # CARTE - Création de la carte Folium
+@st.cache_data(ttl=60)  # Cache pendant 60 secondes
 def create_map(flight_data, airport_coords, radius_km):
     # Calcul du niveau de zoom en fonction du rayon sélectionné
     zoom_level = get_zoom_level(radius_km)
@@ -81,16 +82,16 @@ def create_map(flight_data, airport_coords, radius_km):
     folium.Circle(
         location=airport_coords,
         radius=radius_km * 1000,  # Convertir en mètres
-        color="blue",
+        color="#4b58ff",
         fill=True,
-        fill_color="blue",
+        fill_color="#4b58ff",
         fill_opacity=0.2,
-        popup=f"Périmètre de {radius_km} km autour de l'aéroport"
+        popup=f"Périmètre de <strong>{radius_km}km</strong> autour de l'aéroport"
     ).add_to(m)
     # Ajouter un marqueur pour l'aéroport
     folium.Marker(
         location=airport_coords,
-        popup=chosen_airport_row['nom_aeroport'],
+        popup=f"<strong>{chosen_airport_row['nom_aeroport']}</strong>",
         icon=folium.Icon(color="blue", icon="info-sign")
     ).add_to(m)
     # Collecter les vols proches
@@ -162,6 +163,7 @@ def create_map(flight_data, airport_coords, radius_km):
     return m, enriched_flights
 
 # ZOOM - Fonction pour ajuster le zoom de la carte en fonction du rayon sélectionné
+@st.cache_data(ttl=60)  # Cache pendant 60 secondes
 def get_zoom_level(radius_km):
     if radius_km > 50:
         return 8  # Vue large pour des rayons > 100 km
@@ -231,6 +233,7 @@ def flights_info(nearby_flights):
 
 
 # CALCUL - Calculer la différence entre l'heure d'arrivée estimée et l'heure d'arrivée programmée
+@st.cache_data(ttl=60)  # Cache pendant 60 secondes
 def compare_arrival_times(arrival_estimated, arrival_scheduled):
     # Conversion des heures en objets datetime pour la comparaison
     arrival_estimated = datetime.strptime(arrival_estimated, "%Y-%m-%dT%H:%M:%S.%f") if arrival_estimated else None
@@ -266,6 +269,7 @@ def calcul_delays_moyen(aeroport):
     return(moyenne_delays_arrival, moyenne_delays_departure)
 
 # FORMATAGE - Fonction pour formater les heures
+@st.cache_data(ttl=60)  # Cache pendant 60 secondes
 def format_time(time_str):
     if time_str and isinstance(time_str, str):
         try:
@@ -313,11 +317,11 @@ if chosen_airport_row['trigramme']:
 
         # Colonne 3 : icône météo
         with col3:
-            st.markdown(f""" <div class="col3-image"><img src="{icon_url}" alt="{description}" style="max-width: 100px;"></div>""", unsafe_allow_html=True)
+            st.markdown(f""" <div class="meteo-image"><img src="{icon_url}" alt="{description}" style="max-width: 100px;"></div>""", unsafe_allow_html=True)
 
         # Colonne 4 : détails météo
         with col4:           
-            st.markdown(f'<p class="col4-text">{temperature}°C</p>', unsafe_allow_html=True)
+            st.markdown(f'<p class="temperature-text">{temperature}°C</p>', unsafe_allow_html=True)
             st.write(f"**Vent :** {wind_speed} km/h")
     else:
         # Gestion des erreurs météo

@@ -8,6 +8,16 @@ st.set_page_config(
     layout="wide" # Mode wide uniquement pour cette page
 )
 
+################################### CSS ###################################
+
+# Charger ton fichier CSS
+css_file = 'css/style.css'  # Spécifie le chemin vers ton fichier CSS
+
+# Ajouter un fichier CSS à la carte (ou inclure dans la page HTML)
+with open(css_file, 'r', encoding='utf-8') as file:
+    css = file.read()
+    st.markdown(f"<style>{css}</style>", unsafe_allow_html=True)
+
 ###########################################################################
 
 st.title("💖 L'équipe")
@@ -19,8 +29,7 @@ col1, spacer, col2, spacer, col3 = st.columns([1, 0.1, 1, 0.1, 1])
 with col1:
     st.image("images/amandine.png", width=150)
     st.subheader("Amandine 👋")
-    st.markdown(
-    """
+    st.markdown("""
     <div style="display: flex; gap: 15px; margin-bottom: 20px">
         <a href="https://www.linkedin.com/in/amandine-bessé-2153b1143" target="_blank">
             <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" width="25">
@@ -31,10 +40,12 @@ with col1:
             </svg>
         </a>
     </div>
-    """,
-    unsafe_allow_html=True
-    )
-    st.write("Je suis passionnée par l'aviation, et ce site m'a offert l'opportunité de combiner mes intérêts personnels et les compétences acquises lors de ma formation de data analyst. Je suis fière de vous présenter cette application !")
+    """, unsafe_allow_html=True)
+    st.markdown("""
+    <div class="quote-box">
+        Je suis passionnée par l'aviation, le traitement de données et le développement informatique depuis longtemps, et ce site m'a offert l'opportunité de combiner mes intérêts personnels et les compétences acquises lors de ma formation de data analyst. Je suis fière de vous présenter cette application !
+    </div>
+    """, unsafe_allow_html=True)
    
     cv, qr_code = st.columns([1, 1])
     with cv:
@@ -66,7 +77,11 @@ with col2:
     """,
     unsafe_allow_html=True
     )
-    st.write("Laura est une spécialiste en gestion de projet, assurant la coordination de l'équipe.")
+    st.markdown("""
+    <div class="quote-box">
+        Forte de mon expérience en gestion de projet, j’ai adopté une approche Agile pour assurer un développement fluide et efficace de cette application. En concevant la page de recherche de vols avec affichage des prix, j’ai affiné mon expertise en requêtage d’API et en web scraping, permettant d’offrir aux utilisateurs des informations tarifaires précises et en temps réel.
+    </div>
+    """, unsafe_allow_html=True)    
 
     cv, qr_code = st.columns([1, 1])
     with cv:
@@ -98,7 +113,11 @@ with col3:
     """,
     unsafe_allow_html=True
     )
-    st.write("Passionnée par l'IA et la data, je développe des solutions innovantes pour analyser et prédire les tendances. Cette application explore les données aériennes avec des modèles de Machine Learning pour offrir des insights pertinents.")
+    st.markdown("""
+    <div class="quote-box">
+        Passionnée par l'IA et la data, je développe des solutions innovantes pour analyser et prédire les tendances. Cette application explore les données aériennes avec des modèles de Machine Learning pour offrir des insights pertinents.
+    </div>
+    """, unsafe_allow_html=True)
     
     cv, qr_code = st.columns([1, 1])
     with cv:
