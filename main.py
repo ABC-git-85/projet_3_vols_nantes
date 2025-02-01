@@ -5,7 +5,7 @@ pages = {
     "Site": [
         st.Page("pages/page1_v7.py", title="Vols en live", icon="✈️"),
         st.Page("pages/page2_v6.py", title="Statistiques de vols", icon="📈"),
-        st.Page("pages/page3-1.py", title="Prix des vols", icon="💺"),
+        st.Page("pages/page3_v1.py", title="Prix des vols", icon="💺"),
     ],
     "Ressources": [
         st.Page("pages/source.py", title="Nos sources", icon="📘"),
