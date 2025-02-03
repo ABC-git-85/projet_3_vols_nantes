@@ -2,7 +2,7 @@ import streamlit as st
 import requests
 import pandas as pd
 import os
-from datetime import datetime
+from datetime import datetime 
 
 # 📌 Correction du chemin du fichier CSV
 csv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "airports.csv")
