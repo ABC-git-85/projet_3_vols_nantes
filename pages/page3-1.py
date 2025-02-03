@@ -59,7 +59,7 @@ def get_flight_prices(departure_id, arrival_id, outbound_date):
 
     return response.json()
 
-# Fonction pour afficher les vols sous forme de tableau
+# Fonction pour afficher les vols sous forme de tableau avec CO₂
 def display_flights_table(flights_data):
     if "data" in flights_data and "itineraries" in flights_data["data"]:
         itineraries = flights_data["data"]["itineraries"]
@@ -72,112 +72,71 @@ def display_flights_table(flights_data):
         flight_list = []
 
         for i, flight in enumerate(top_flights):
-            flights = flight.get("flights", [])
-            if not flights:
-                flights = flight.get("extensions", [])
+            flights = flight.get("flights", []) or flight.get("extensions", [])
             
-            # Initialisation des variables pour stocker les informations du vol complet
-            departure_airport = None
-            arrival_airport = None
-            airline_logo = None
-            departure_time = None
-            arrival_time = None
+            departure_airport = arrival_airport = airline_logo = departure_time = arrival_time = None
             price = flight.get("price", "Non précisé")
-            stops = len(flights) - 1  # Nombre d'escales
+            stops = len(flights) - 1
             stop_details = []
-
-            # Récupérer la durée de l'itinéraire complet (avant le tableau flights)
-            total_duration = flight.get("duration", {}).get("text", "Non spécifiée")
-            
-            # Nettoyer la durée (enlever le "r" et le "hr")
-            total_duration_cleaned = total_duration.replace("hr", "h").replace("r", "")
+            total_duration = flight.get("duration", {}).get("text", "Non spécifiée").replace("hr", "h").replace("r", "")
+            carbon_emissions = flight.get("carbon_emissions", {}).get("CO2e", "Non précisé")
 
             for idx, f in enumerate(flights):
                 if idx == 0:
-                    # Premier segment (départ)
-                    departure_airport_name = f.get("departure_airport", {}).get("airport_name", "Inconnu")
-                    departure_airport_code = f.get("departure_airport", {}).get("airport_code", "Inconnu")
-                    departure_airport = f"{departure_airport_name} ({departure_airport_code})"
+                    departure_airport = f"{f.get('departure_airport', {}).get('airport_name', 'Inconnu')} ({f.get('departure_airport', {}).get('airport_code', 'Inconnu')})"
                     departure_time = f.get("departure_airport", {}).get("time", "Inconnu").split(' ')[1] if " " in f.get("departure_airport", {}).get("time", "Inconnu") else f.get("departure_airport", {}).get("time", "Inconnu")
                     airline_logo = f"<img src='{f.get('airline_logo')}' width='50'/>" if f.get('airline_logo') else f.get('airline')
-
                 if idx == len(flights) - 1:
-                    # Dernier segment (arrivée)
-                    arrival_airport_name = f.get("arrival_airport", {}).get("airport_name", "Inconnu")
-                    arrival_airport_code = f.get("arrival_airport", {}).get("airport_code", "Inconnu")
-                    arrival_airport = f"{arrival_airport_name} ({arrival_airport_code})"
+                    arrival_airport = f"{f.get('arrival_airport', {}).get('airport_name', 'Inconnu')} ({f.get('arrival_airport', {}).get('airport_code', 'Inconnu')})"
                     arrival_time = f.get("arrival_airport", {}).get("time", "Inconnu").split(' ')[1] if " " in f.get("arrival_airport", {}).get("time", "Inconnu") else f.get("arrival_airport", {}).get("time", "Inconnu")
-
                 if idx > 0:
-                    # Informations sur les escales
-                    stop_airport_name = f.get("departure_airport", {}).get("airport_name", "Inconnu")
-                    stop_airport_code = f.get("departure_airport", {}).get("airport_code", "Inconnu")
-                    stop_details.append(f"{stop_airport_name} ({stop_airport_code})")
+                    stop_details.append(f"{f.get('departure_airport', {}).get('airport_name', 'Inconnu')} ({f.get('departure_airport', {}).get('airport_code', 'Inconnu')})")
 
-            # Création de la ligne du tableau pour cet itinéraire
-            flight_info = {
+            flight_list.append({
                 "Vol": i + 1,
                 "Départ": departure_airport,
                 "Arrivée": arrival_airport,
                 "Compagnie": airline_logo,
                 "Heure de départ": departure_time,
                 "Heure d'arrivée": arrival_time,
-                "Durée": total_duration_cleaned,  # Durée nettoyée
+                "Durée": total_duration,
                 "Prix (EUR)": price,
+                "CO₂ (kg)": carbon_emissions,
                 "Escales": f"{stops} escale(s)" if stops > 0 else "Direct",
                 "Détails des escales": ", ".join(stop_details) if stop_details else "Aucune",
                 "Réservation": f'<a href="https://www.google.com/flights?booking_token={flight.get("booking_token")}" target="_blank">Réserver ici</a>'
-            }
-            flight_list.append(flight_info)
+            })
 
         df_flights = pd.DataFrame(flight_list)
-
         st.markdown(df_flights.to_html(escape=False, index=False), unsafe_allow_html=True)
-
     else:
         st.warning("⚠️ Aucune donnée disponible.")
 
 # 🎨 Interface utilisateur
 st.title("🔎 Recherche de Vols ✈️")
 
-# Sélection de la ville de départ via un menu déroulant
 departure_city = st.selectbox("Sélectionnez votre ville de départ", airport_choices)
 
-# Récupération du code aéroport correspondant
 departure_data = df_airports[df_airports["ville"] == departure_city]
-if not departure_data.empty:
-    departure_id = departure_data.iloc[0]["trigramme"]
-else:
+if departure_data.empty:
     st.error("❌ Aucune correspondance trouvée pour cette ville de départ.")
     st.stop()
+departure_id = departure_data.iloc[0]["trigramme"]
 
-# Sélection de la ville d’arrivée via un menu déroulant
 arrival_choices = df_destinations["ville"].unique().tolist()
 arrival_city = st.selectbox("Sélectionnez votre destination", arrival_choices)
 
-# Recherche du code IATA de la destination
 def get_arrival_iata(arrival_city):
     arrival_data = df_destinations[df_destinations["ville"].str.contains(arrival_city, case=False, na=False)]
-    if not arrival_data.empty:
-        return arrival_data.iloc[0]["trigramme"]
-    else:
-        st.warning(f"⚠️ Aucun aéroport trouvé pour '{arrival_city}'. Veuillez entrer un code IATA.")
-        return None
+    return arrival_data.iloc[0]["trigramme"] if not arrival_data.empty else None
 
 arrival_id = get_arrival_iata(arrival_city)
-
-# Sélection de la date de départ
 outbound_date = st.date_input("Date de départ", datetime.today().date())
 
-# Bouton pour rechercher les vols
 if st.button("🔍 Rechercher les vols"):
-    if not departure_id or not arrival_id:
-        st.error("⚠️ Veuillez entrer une ville de départ et une ville d'arrivée valides.")
-    else:
-        formatted_date = outbound_date.strftime('%Y-%m-%d')  # Format pour l'API
-        flights_data = get_flight_prices(departure_id, arrival_id, formatted_date)
-
-        if flights_data and "data" in flights_data and "itineraries" in flights_data["data"]:
+    if departure_id and arrival_id:
+        flights_data = get_flight_prices(departure_id, arrival_id, outbound_date.strftime('%Y-%m-%d'))
+        if flights_data:
             display_flights_table(flights_data)
         else:
-            st.warning("❌ Aucun vol trouvé pour cette destination.")
+            st.warning("❌ Aucun vol trouvé.")
