@@ -112,23 +112,13 @@ def load_and_compare_delays_s3(bucket_name, folder_path, current_time):
         previous_file_path = f"s3://{bucket_name}/{folder_path}/{previous_file_name}"
         
         try:
-            previous_df = pd.read_csv(previous_file_path)
-            avg_arrival_delay_prev, avg_departure_delay_prev = calcul_delays_moyen(previous_df)
-            
-            # Comparaison avec les moyennes actuelles
-            print(f"Comparaison des retards d'arrivée: {avg_arrival_delay - avg_arrival_delay_prev:.2f} minutes")
-            print(f"Comparaison des retards de départ: {avg_departure_delay - avg_departure_delay_prev:.2f} minutes")
+            previous_df = pd.read_csv(previous_file_path)            
         except FileNotFoundError:
             print("Aucun fichier précédent trouvé pour la comparaison.")
     else:
         print("Aucun fichier trouvé pour l'heure actuelle.")
     
     return df
-
-# Exemple d'appel
-bucket_name = 'projet-3-avion'  # Nom du bucket S3
-folder_path = 'exports_mageAI'  # Dossier contenant les fichiers CSV
-current_time = datetime.now()  # Heure actuelle
 
 df = load_and_compare_delays_s3(bucket_name, folder_path, current_time)
 
