@@ -21,7 +21,7 @@ st.set_page_config(
 css_file = 'css/style.css'  # Spécifie le chemin vers ton fichier CSS
 
 # Ajouter un fichier CSS à la carte (ou inclure dans la page HTML)
-with open(css_file, 'r') as file:
+with open(css_file, 'r', encoding='utf-8') as file:
     css = file.read()
 
 # Ajouter le CSS au fichier HTML généré
@@ -296,8 +296,8 @@ if chosen_airport_row['trigramme']:
     col1, col2, col3, col4 = st.columns([2, 2, 1, 2])  # Colonne 4 plus large
 
     # Afficher les métriques de départ et d'arrivée
-    col1.metric("Au départ", f"🛫 {int(moyenne_delays_arrival_t)} min", "-2 min" if moyenne_delays_arrival_t else "-", delta_color="inverse")
-    col2.metric("À l'arrivée", f"🛬 {int(moyenne_delays_departure_t)} min", "+4 min" if moyenne_delays_departure_t else "-", delta_color="inverse")
+    col1.metric("Au départ", f"🛫 {int(moyenne_delays_departure_t)} min", "+4 min" if moyenne_delays_departure_t else "-", delta_color="inverse")
+    col2.metric("À l'arrivée", f"🛬{int(moyenne_delays_arrival_t)} min", "-2 min" if moyenne_delays_arrival_t else "-", delta_color="inverse")
     
     # Obtenir les données météo
     weather_data = get_weather(chosen_airport_row['ville'])

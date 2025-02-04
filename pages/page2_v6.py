@@ -124,37 +124,37 @@ with col2:
         # Bascule l'état de show_graph
         st.session_state.show_graph = not st.session_state.show_graph
 
-    # Si l'état du graphique est "True", affiche-le
-    if st.session_state.show_graph:
-        # Saisonnalité du trafic aérien en France par mois (2016-2024)
-        months = {'1':'Janvier', '2':'Février', '3':'Mars', '4':'Avril', '5':'Mai', '6':'Juin', '7':'Juillet', '8':'Août', '9':'Septembre', '10':'Octobre', '11':'Novembre', '12':'Décembre'}
+# Si l'état du graphique est "True", affiche-le
+if st.session_state.show_graph:
+    # Saisonnalité du trafic aérien en France par mois (2016-2024)
+    months = {'1':'Janvier', '2':'Février', '3':'Mars', '4':'Avril', '5':'Mai', '6':'Juin', '7':'Juillet', '8':'Août', '9':'Septembre', '10':'Octobre', '11':'Novembre', '12':'Décembre'}
 
-        trafic_aerien_fr_month = trafic_aerien_fr[['MONTH_NUM', 'YEAR', 'FLT_TOT_1']]
-        trafic_aerien_fr_month = trafic_aerien_fr_month[trafic_aerien_fr_month['YEAR'] > 2018]
-        trafic_aerien_fr_month = trafic_aerien_fr_month.groupby(["YEAR", "MONTH_NUM"]).sum()
-        trafic_aerien_fr_month = trafic_aerien_fr_month.reset_index()
-        trafic_aerien_fr_month['MONTH_NAME'] = trafic_aerien_fr_month['MONTH_NUM'].astype(str).map(months)
-        trafic_aerien_fr_month = trafic_aerien_fr_month.sort_values(by=["YEAR", "MONTH_NUM"], ascending=True)
-        trafic_aerien_fr_month['YEAR'] = trafic_aerien_fr_month['YEAR'].astype(str)
+    trafic_aerien_fr_month = trafic_aerien_fr[['MONTH_NUM', 'YEAR', 'FLT_TOT_1']]
+    trafic_aerien_fr_month = trafic_aerien_fr_month[trafic_aerien_fr_month['YEAR'] > 2018]
+    trafic_aerien_fr_month = trafic_aerien_fr_month.groupby(["YEAR", "MONTH_NUM"]).sum()
+    trafic_aerien_fr_month = trafic_aerien_fr_month.reset_index()
+    trafic_aerien_fr_month['MONTH_NAME'] = trafic_aerien_fr_month['MONTH_NUM'].astype(str).map(months)
+    trafic_aerien_fr_month = trafic_aerien_fr_month.sort_values(by=["YEAR", "MONTH_NUM"], ascending=True)
+    trafic_aerien_fr_month['YEAR'] = trafic_aerien_fr_month['YEAR'].astype(str)
 
-        graph_type = st.radio("", ("En barres", "En lignes"))
-        color_palette = px.colors.qualitative.Plotly
-        # Source
-        annotations = []
-        annotations.append(dict(xref='paper', yref='paper', x=0.5, y=-0.23,
-                                    xanchor='center', yanchor='top',
-                                    text='Source : © 2024 EUROCONTROL',
-                                    font=dict(size=10, color='rgb(150,150,150)'),
-                                    showarrow=False))
-        
-        if graph_type == "En barres":
-            fig = px.bar(trafic_aerien_fr_month, x='MONTH_NAME', y='FLT_TOT_1', color='YEAR', barmode='group', text_auto=True, labels={'FLT_TOT_1': "Vols", 'MONTH_NAME': "Mois", 'YEAR':'Année'}, title="☀️ Saisonnalité du trafic en France", color_discrete_sequence=color_palette)
-            fig.update_traces(texttemplate="%{y:,.0f}")
-            fig.update_layout(title={'font': {'size': 20}}, xaxis_title='', annotations=annotations)
-        elif graph_type == "En lignes":
-            fig = px.line(trafic_aerien_fr_month, x='MONTH_NAME', y='FLT_TOT_1', color='YEAR', markers=True, labels=dict(FLT_TOT_1="Vols", MONTH_NAME="Mois", YEAR="Année"), title="☀️ Saisonnalité du trafic en France", color_discrete_sequence=color_palette)
-            fig.update_layout(title={'font': {'size': 20}}, xaxis_title='', annotations=annotations)
-        st.plotly_chart(fig)    
+    graph_type = st.radio("", ("En barres", "En lignes"))
+    color_palette = px.colors.qualitative.Plotly
+    # Source
+    annotations = []
+    annotations.append(dict(xref='paper', yref='paper', x=0.5, y=-0.23,
+                                xanchor='center', yanchor='top',
+                                text='Source : © 2024 EUROCONTROL',
+                                font=dict(size=10, color='rgb(150,150,150)'),
+                                showarrow=False))
+    
+    if graph_type == "En barres":
+        fig = px.bar(trafic_aerien_fr_month, x='MONTH_NAME', y='FLT_TOT_1', color='YEAR', barmode='group', text_auto=True, labels={'FLT_TOT_1': "Vols", 'MONTH_NAME': "Mois", 'YEAR':'Année'}, title="☀️ Saisonnalité du trafic en France", color_discrete_sequence=color_palette)
+        fig.update_traces(texttemplate="%{y:,.0f}")
+        fig.update_layout(title={'font': {'size': 20}}, xaxis_title='', annotations=annotations)
+    elif graph_type == "En lignes":
+        fig = px.line(trafic_aerien_fr_month, x='MONTH_NAME', y='FLT_TOT_1', color='YEAR', markers=True, labels=dict(FLT_TOT_1="Vols", MONTH_NAME="Mois", YEAR="Année"), title="☀️ Saisonnalité du trafic en France", color_discrete_sequence=color_palette)
+        fig.update_layout(title={'font': {'size': 20}}, xaxis_title='', annotations=annotations)
+    st.plotly_chart(fig)    
 
 ################################### AÉROPORT DE NANTES ###################################
 

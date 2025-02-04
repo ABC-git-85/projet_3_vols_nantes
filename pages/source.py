@@ -16,8 +16,8 @@ st.title("🔢 Sources de données")
 
 # 📡 APIs
 st.header("🔄️ APIs")
-st.markdown("[Aviation Edge](https://aviation-edge.com/)")
-st.write("Pour les données de suivi en temps réel et l'historique des données de vol (moins de 1 an).")
+
+st.markdown("📍 [Aviation Edge](https://aviation-edge.com/) pour les données de suivi en temps réel et l'historique des données de vol")
 
 st.markdown("""
 > **À quelle fréquence les données sont-elles mises à jour pour les données en temps réel ?**  
@@ -25,9 +25,14 @@ st.markdown("""
 > - Les données de calendrier sont mises à jour toutes les **15 minutes** environ.
 """)
 
-st.markdown("---")  # Séparateur visuel
+st.markdown("""
+> **Quel est l'historique des données disponibles sur l'API ?**
+> - Nous avons accès aux données des 12 derniers mois, selon nos conditions d'abonnement.            
+""")
 
-st.markdown("📉 **Pour les prix des vols :** [Google Flights API](https://serpapi.com/google-flights-api)")
+st.markdown("💲[Google Flights API](https://serpapi.com/google-flights-api) pour les prix des vols")
+
+st.markdown("---")  # Séparateur visuel
 
 # 🌍 Sites et données
 st.header("🛜 Les sites")
