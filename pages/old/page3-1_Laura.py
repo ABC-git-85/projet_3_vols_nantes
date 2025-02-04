@@ -60,7 +60,7 @@ def get_flight_prices(departure_id, arrival_id, outbound_date):
     return response.json()
 
 # Fonction pour afficher les vols sous forme de tableau avec CO₂
-def display_optimal_flight(flights_data):
+def display_flights_table(flights_data):
     if "data" in flights_data and "itineraries" in flights_data["data"]:
         itineraries = flights_data["data"]["itineraries"]
         top_flights = itineraries.get("topFlights", [])
@@ -69,7 +69,6 @@ def display_optimal_flight(flights_data):
             st.warning("⚠️ Aucun vol trouvé.")
             return
 
-        # Liste pour stocker les informations des vols
         flight_list = []
 
         for i, flight in enumerate(top_flights):
@@ -77,10 +76,10 @@ def display_optimal_flight(flights_data):
             
             departure_airport = arrival_airport = airline_logo = departure_time = arrival_time = None
             price = flight.get("price", "Non précisé")
-            stops = len(flights) - 1  # Nombre d'escales
+            stops = len(flights) - 1
             stop_details = []
-            total_duration = flight.get("duration", {}).get("text", "Non spécifiée").replace("hr", "h").replace("r", "").replace("min", "")
-            carbon_emissions = int(flight.get("carbon_emissions", {}).get("CO2e", "Non précisé")/1000)
+            total_duration = flight.get("duration", {}).get("text", "Non spécifiée").replace("hr", "h").replace("r", "")
+            carbon_emissions = flight.get("carbon_emissions", {}).get("CO2e", "Non précisé")
 
             for idx, f in enumerate(flights):
                 if idx == 0:
@@ -94,6 +93,7 @@ def display_optimal_flight(flights_data):
                     stop_details.append(f"{f.get('departure_airport', {}).get('airport_name', 'Inconnu')} ({f.get('departure_airport', {}).get('airport_code', 'Inconnu')})")
 
             flight_list.append({
+                "Vol": i + 1,
                 "Départ": departure_airport,
                 "Arrivée": arrival_airport,
                 "Compagnie": airline_logo,
@@ -101,19 +101,13 @@ def display_optimal_flight(flights_data):
                 "Heure d'arrivée": arrival_time,
                 "Durée": total_duration,
                 "Prix (EUR)": price,
-                "CO² (T)": carbon_emissions,
-                "Escale(s)": f"{stops} escale(s)" if stops > 0 else "Direct",
+                "CO₂ (kg)": carbon_emissions,
+                "Escales": f"{stops} escale(s)" if stops > 0 else "Direct",
                 "Détails des escales": ", ".join(stop_details) if stop_details else "Aucune",
-                "Réservation": f'<a href="https://www.google.com/flights?booking_token={flight.get("booking_token")}" target="_blank">Réserver ici</a>',
+                "Réservation": f'<a href="https://www.google.com/flights?booking_token={flight.get("booking_token")}" target="_blank">Réserver ici</a>'
             })
 
-        # Convertir en DataFrame
         df_flights = pd.DataFrame(flight_list)
-
-        # Trier par nombre d'escales, prix et CO₂
-        df_flights = df_flights.sort_values(by=["Escale(s)", "Prix (EUR)", "CO² (T)"], ascending=[False, True, True])
-
-        # Afficher l'itinéraire optimal (le premier vol dans la liste triée)
         st.markdown(df_flights.to_html(escape=False, index=False), unsafe_allow_html=True)
     else:
         st.warning("⚠️ Aucune donnée disponible.")
@@ -143,6 +137,6 @@ if st.button("🔍 Rechercher les vols"):
     if departure_id and arrival_id:
         flights_data = get_flight_prices(departure_id, arrival_id, outbound_date.strftime('%Y-%m-%d'))
         if flights_data:
-            display_optimal_flight(flights_data)
+            display_flights_table(flights_data)
         else:
             st.warning("❌ Aucun vol trouvé.")
