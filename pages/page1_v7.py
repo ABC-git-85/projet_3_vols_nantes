@@ -275,7 +275,7 @@ def format_time(time_str):
 
 ################################### PAGE ###################################
 
-st.subheader("✈️ Aéroport")
+st.header("✈️ Aéroport")
 
 # Création de la liste pour la selectbox avec format "Nom Aéroport (Trigramme)"
 airport_options = [f"{row['nom_aeroport']} ({row['trigramme']})" for _, row in airports_df.iterrows()]
@@ -286,7 +286,7 @@ airport_choice = st.selectbox('Choisir un aéroport :', airport_options)
 # Extraire le trigramme de l'aéroport choisi pour retrouver les coordonnées
 chosen_airport_row = airports_df[airports_df.apply(lambda row: f"{row['nom_aeroport']} ({row['trigramme']})" == airport_choice, axis=1)].iloc[0]
 
-st.subheader("🕔 Retards moyens")
+st.subheader("🕔 Temps de retard moyen aujourd'hui")
 
 # Affichage des KPI
 if chosen_airport_row['trigramme']:
@@ -312,11 +312,11 @@ if chosen_airport_row['trigramme']:
 
         # Colonne 3 : icône météo
         with col3:
-            st.markdown(f""" <div class="col3-image"><img src="{icon_url}" alt="{description}" style="max-width: 100px;"></div>""", unsafe_allow_html=True)
+            st.markdown(f""" <div class="meteo-image"><img src="{icon_url}" alt="{description}" style="max-width: 100px;"></div>""", unsafe_allow_html=True)
 
         # Colonne 4 : détails météo
         with col4:           
-            st.markdown(f'<p class="col4-text">{temperature}°C</p>', unsafe_allow_html=True)
+            st.markdown(f'<p class="temperature-text">{temperature}°C</p>', unsafe_allow_html=True)
             st.write(f"**Vent :** {wind_speed} km/h")
     else:
         # Gestion des erreurs météo
