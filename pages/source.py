@@ -30,7 +30,9 @@ st.markdown("""
 > - Nous avons accès aux données des 12 derniers mois, selon nos conditions d'abonnement.            
 """)
 
-st.markdown("💲[Google Flights API](https://serpapi.com/google-flights-api) pour les prix des vols")
+st.markdown("💲 [Google Flights API](https://serpapi.com/google-flights-api) pour les prix des vols")
+
+st.markdown("🌤️ [Weather API](https://www.weatherapi.com) pour la météo")
 
 st.markdown("---")  # Séparateur visuel
 
