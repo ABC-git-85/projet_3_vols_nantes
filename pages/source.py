@@ -1,16 +1,12 @@
 import streamlit as st
 
-########################################
-# 📌 CONFIGURATION DE LA PAGE
-########################################
+################################ CONF PAGE ################################
 
 st.set_page_config(
-    layout="centered"  # Centrage de l'affichage pour une meilleure lisibilité
+    layout="wide"  # Centrage de l'affichage pour une meilleure lisibilité
 )
 
-########################################
-# 📌 GUIDE UTILISATEUR
-########################################
+########################## 📌 GUIDE UTILISATEUR ###########################
 
 st.title("📖 Guide Utilisateur")
 
@@ -80,5 +76,5 @@ Bienvenue sur **Projet 3 Vols Nantes**, une application qui vous permet d'explor
 ---
 
 ## 🆘 Support & Contact  
-Si vous avez des questions ou rencontrez un problème, vous pouvez contacter l’équipe via la [**Page Équipe**](https://projet3volsnantes-als.streamlit.app/equipe_v2).
+Si vous avez des questions ou rencontrez un problème, vous pouvez contacter l’équipe ici : [**À propos de nous**](https://projet3volsnantes-als.streamlit.app/equipe)
 """)
