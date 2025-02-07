@@ -2,7 +2,15 @@ import streamlit as st
 import requests
 import pandas as pd
 import os
-from datetime import datetime 
+from datetime import datetime
+
+################################ CONF PAGE ################################
+
+st.set_page_config(
+    layout="wide" # Mode wide uniquement pour cette page
+)
+
+###########################################################################
 
 # 📌 Correction du chemin du fichier CSV
 csv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "airports.csv")
@@ -59,6 +67,22 @@ def get_flight_prices(departure_id, arrival_id, outbound_date):
 
     return response.json()
 
+# Fonction pour formater l'heure
+def format_time(time_str):
+    """Formatte l'heure en remplaçant 'h' par ':' et assure que les minutes ont deux chiffres."""
+    if time_str == "Inconnu":
+        return time_str
+
+    # Remplacer " h " par "h" puis "h" par ":"
+    time_str = time_str.replace(" h ", "h").replace("h", ":")
+
+    try:
+        # Séparer heures et minutes, s'assurer que les minutes sont sur 2 chiffres
+        hours, minutes = time_str.split(":")
+        return f"{int(hours)}:{int(minutes):02d}"
+    except ValueError:
+        return "Format invalide"    
+
 # Fonction pour afficher les vols sous forme de tableau avec CO₂
 def display_optimal_flight(flights_data):
     if "data" in flights_data and "itineraries" in flights_data["data"]:
@@ -99,10 +123,10 @@ def display_optimal_flight(flights_data):
                 "Compagnie": airline_logo,
                 "Heure de départ": departure_time,
                 "Heure d'arrivée": arrival_time,
-                "Durée": total_duration,
-                "Prix (EUR)": price, "€",
-                "CO² (T)": carbon_emissions,
-                "Escale(s)": f"{stops} escale(s)" if stops > 0 else "Direct",
+                "Durée": format_time(total_duration),
+                "Prix": price,
+                "CO² (en T)": carbon_emissions,
+                "Escale(s)": f"{stops}&nbsp;escale(s)" if stops > 0 else "Direct",
                 "Détails des escales": ", ".join(stop_details) if stop_details else "Aucune",
                 "Réservation": f'<a href="https://www.google.com/flights?booking_token={flight.get("booking_token")}" target="_blank">Réserver ici</a>',
             })
@@ -111,7 +135,10 @@ def display_optimal_flight(flights_data):
         df_flights = pd.DataFrame(flight_list)
 
         # Trier par nombre d'escales, prix et CO₂
-        df_flights = df_flights.sort_values(by=["Escale(s)", "Prix (EUR)", "CO² (T)"], ascending=[False, True, True])
+        df_flights = df_flights.sort_values(by=["Escale(s)", "Prix", "CO² (en T)"], ascending=[False, True, True])
+
+        # Ajouter le symbole € uniquement lors de l'affichage
+        df_flights["Prix"] = df_flights["Prix"].astype(str) + "&nbsp;€"
 
         # Afficher l'itinéraire optimal (le premier vol dans la liste triée)
         st.markdown(df_flights.to_html(escape=False, index=False), unsafe_allow_html=True)

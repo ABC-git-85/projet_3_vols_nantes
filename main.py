@@ -9,7 +9,7 @@ pages = {
     ],
     "Ressources": [
         st.Page("pages/source.py", title="Nos sources", icon="📘"),
-        st.Page("pages/equipe_v2.py", title="À propos de nous", icon="ℹ️")
+        st.Page("pages/equipe.py", title="À propos de nous", icon="ℹ️")
     ],
 }
 
