@@ -100,7 +100,7 @@ def display_optimal_flight(flights_data):
                 "Heure de départ": departure_time,
                 "Heure d'arrivée": arrival_time,
                 "Durée": total_duration,
-                "Prix (EUR)": price,
+                "Prix (EUR)": price, "€",
                 "CO² (T)": carbon_emissions,
                 "Escale(s)": f"{stops} escale(s)" if stops > 0 else "Direct",
                 "Détails des escales": ", ".join(stop_details) if stop_details else "Aucune",
