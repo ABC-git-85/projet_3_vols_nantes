@@ -2,6 +2,9 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 from streamlit_plotly_events import plotly_events
+import numpy as np
+import plotly.graph_objects as go
+import statsmodels.api as sm
 
 ################################ CONF PAGE ################################
 
@@ -106,12 +109,35 @@ with col2:
 
 # Évolution du trafic aérien en France par jour (2016-2024)
 trafic_aerien_fr['FLT_DATE'] = pd.to_datetime(trafic_aerien_fr['FLT_DATE'], format='%d/%m/%Y')
-fig = px.line(trafic_aerien_fr, x='FLT_DATE', y='FLT_TOT_1', labels=dict(FLT_TOT_1="Vols", FLT_DATE="Dates"), title="🔵⚪🔴 Évolution du trafic global en France", color_discrete_sequence=px.colors.qualitative.G10, hover_data={'FLT_DATE': '|%d/%m/%Y', 'FLT_TOT_1': True})
+trafic_aerien_fr_by_day = trafic_aerien_fr.groupby(["FLT_DATE"])["FLT_TOT_1"].sum()
+trafic_aerien_fr_by_day = trafic_aerien_fr_by_day.reset_index()
+# Ajout de la courbe de tendance LOWESS
+trafic_aerien_fr_by_day["date_num"] = np.arange(len(trafic_aerien_fr_by_day)) # Conversion des dates en valeurs numériques pour la régression
+lowess = sm.nonparametric.lowess(trafic_aerien_fr_by_day['FLT_TOT_1'], trafic_aerien_fr_by_day['date_num'], frac=0.2) # Ajustement de la tendance LOWESS
+
+fig = px.area(trafic_aerien_fr_by_day, x='FLT_DATE', y='FLT_TOT_1', labels=dict(FLT_TOT_1="Vols", FLT_DATE="Dates"), title="🔵⚪🔴 Évolution du trafic global en France", color_discrete_sequence=px.colors.qualitative.G10, hover_data={'FLT_DATE': '|%d/%m/%Y', 'FLT_TOT_1': True})
 fig.update_xaxes(
     tickformat='%m/%Y',
+    showticklabels=True,
     rangeslider=dict(visible=True),  # Curseur pour zoomer
+    rangeselector=dict(  # Ajout des boutons de zoom rapide
+        buttons=[
+            dict(count=1, label="1M", step="month", stepmode="backward"),
+            dict(count=3, label="3M", step="month", stepmode="backward"),
+            dict(count=6, label="6M", step="month", stepmode="backward"),
+            dict(count=1, label="1Y", step="year", stepmode="backward"),
+            dict(step="all", label="Tout voir")
+        ]
+    )
 )
-fig.update_layout(title={'font': {'size': 20}}, xaxis_title='', annotations=annotations)
+fig.add_trace(go.Scatter(x=trafic_aerien_fr_by_day["FLT_DATE"], y=lowess[:, 1], mode="lines", name="Tendance LOWESS", line=dict(color="orange", width=2), showlegend=False, yaxis="y2", hovertemplate="Tendance LOWESS: %{y:.0f}<extra></extra>"))
+fig.update_layout(title={'font': {'size': 20}}, xaxis_title='', hovermode="x unified", annotations=annotations, yaxis2=dict(
+        title="Tendance LOWESS",
+        overlaying='y',
+        side='right',
+        showgrid=False,
+        tickvals=[]  # Pas de ticks sur cet axe
+    ),)
 st.plotly_chart(fig)
 
 # Affichage du bouton pour basculer l'affichage du graphique

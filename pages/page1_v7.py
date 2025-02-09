@@ -110,7 +110,8 @@ def create_map(flight_data, airport_coords, radius_km):
                     "Longitude": longitude,
                     "Altitude (m)": altitude,
                     "Distance (km)": round(distance, 2),
-                    "Code Vol": flight['flight']['iataNumber'] or "Inconnu"
+                    "Code Vol": flight['flight']['iataNumber'] or "Inconnu",
+                    "Type d'appareil" : flight['aircraft']['iataCode']
                 })
         except KeyError:
             # Passer les vols qui ne possèdent pas les données nécessaires
@@ -363,7 +364,7 @@ st.divider()
 columns_order = [
     "Code Vol", "Compagnie", "Aéroport départ", "Aéroport arrivée",
     "Départ prévu", "Départ réel", "Arrivée prévue", "Arrivée estimée",
-    "Distance (km)", "Altitude (m)", "Latitude", "Longitude"
+    "Type d'appareil", "Distance (km)", "Altitude (m)", "Latitude", "Longitude"
 ]
 if nearby_flights:
     st.write("### 📍 Liste des vols repérés")
