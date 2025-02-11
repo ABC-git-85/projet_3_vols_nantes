@@ -18,9 +18,9 @@ Bienvenue sur **Projet 3 Vols Nantes**, une application qui vous permet d'explor
 ## 🔢 Sources de données
 
 #### 🔹 APIs
- - 📍 [Aviation Edge](https://aviation-edge.com/) pour les données de suivi en temps réel et l'historique des données de vol"
- - 💲 [Google Flights API](https://serpapi.com/google-flights-api) pour les prix des vols"
- - 🌤️ [Weather API](https://www.weatherapi.com) pour la météo"
+ - 📍 [Aviation Edge](https://aviation-edge.com/) pour les données de suivi en temps réel et l'historique des données de vol.
+ - 💲 [Google Flights API](https://serpapi.com/google-flights-api) pour les prix des vols.
+ - 🌤️ [Weather API](https://www.weatherapi.com) pour la météo.
             
 #### 🔹 Les sites            
  - Pour les statistiques de vols : [Eurocontrol](https://www.eurocontrol.int/)
