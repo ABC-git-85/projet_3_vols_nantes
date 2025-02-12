@@ -3,6 +3,8 @@ import requests
 import pandas as pd
 import os
 from datetime import datetime
+import google.generativeai as genai
+
 
 # 📌 Correction du chemin du fichier CSV
 csv_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "airports.csv")
@@ -60,7 +62,7 @@ def get_flight_prices(departure_id, arrival_id, outbound_date):
     return response.json()
 
 # Fonction pour afficher les vols sous forme de tableau avec CO₂
-def display_flights_table(flights_data):
+def display_optimal_flight(flights_data):
     if "data" in flights_data and "itineraries" in flights_data["data"]:
         itineraries = flights_data["data"]["itineraries"]
         top_flights = itineraries.get("topFlights", [])
@@ -69,17 +71,18 @@ def display_flights_table(flights_data):
             st.warning("⚠️ Aucun vol trouvé.")
             return
 
+        # Liste pour stocker les informations des vols
         flight_list = []
 
         for i, flight in enumerate(top_flights):
             flights = flight.get("flights", []) or flight.get("extensions", [])
-            
+
             departure_airport = arrival_airport = airline_logo = departure_time = arrival_time = None
             price = flight.get("price", "Non précisé")
-            stops = len(flights) - 1
+            stops = len(flights) - 1  # Nombre d'escales
             stop_details = []
-            total_duration = flight.get("duration", {}).get("text", "Non spécifiée").replace("hr", "h").replace("r", "")
-            carbon_emissions = flight.get("carbon_emissions", {}).get("CO2e", "Non précisé")
+            total_duration = flight.get("duration", {}).get("text", "Non spécifiée").replace("hr", "h").replace("r", "").replace("min", "")
+            carbon_emissions = int(flight.get("carbon_emissions", {}).get("CO2e", "Non précisé")/1000)
 
             for idx, f in enumerate(flights):
                 if idx == 0:
@@ -93,7 +96,6 @@ def display_flights_table(flights_data):
                     stop_details.append(f"{f.get('departure_airport', {}).get('airport_name', 'Inconnu')} ({f.get('departure_airport', {}).get('airport_code', 'Inconnu')})")
 
             flight_list.append({
-                "Vol": i + 1,
                 "Départ": departure_airport,
                 "Arrivée": arrival_airport,
                 "Compagnie": airline_logo,
@@ -101,16 +103,49 @@ def display_flights_table(flights_data):
                 "Heure d'arrivée": arrival_time,
                 "Durée": total_duration,
                 "Prix (EUR)": price,
-                "CO₂ (kg)": carbon_emissions,
-                "Escales": f"{stops} escale(s)" if stops > 0 else "Direct",
+                "CO² (T)": carbon_emissions,
+                "Escale(s)": f"{stops} escale(s)" if stops > 0 else "Direct",
                 "Détails des escales": ", ".join(stop_details) if stop_details else "Aucune",
-                "Réservation": f'<a href="https://www.google.com/flights?booking_token={flight.get("booking_token")}" target="_blank">Réserver ici</a>'
+                "Réservation": f'<a href="https://www.google.com/flights?booking_token={flight.get("booking_token")}" target="_blank">Réserver ici</a>',
             })
 
+        # Convertir en DataFrame
         df_flights = pd.DataFrame(flight_list)
+
+        # Trier par nombre d'escales, prix et CO₂
+        df_flights = df_flights.sort_values(by=["Escale(s)", "Prix (EUR)", "CO² (T)"], ascending=[False, True, True])
+
+        # Sauvegarder le DataFrame dans session_state
+        st.session_state.flights_df = df_flights
+
+        # Afficher l'itinéraire optimal (le premier vol dans la liste triée)
         st.markdown(df_flights.to_html(escape=False, index=False), unsafe_allow_html=True)
     else:
         st.warning("⚠️ Aucune donnée disponible.")
+
+# Initialisation du modèle de Chatbot
+model = genai.GenerativeModel('gemini-1.5-flash')
+
+# Création du prompt système
+system_prompt = """
+Tu es un guide touristique spécialisé dans les recommandations de restaurants et d'attractions.
+Tu fournis des suggestions basées sur des avis populaires et des lieux bien notés.
+"""
+
+# Initialisation de l'historique avec le prompt système
+chat = model.start_chat(history=[{'role': 'user', 'parts': [system_prompt]}])
+
+# Fonction pour obtenir des recommandations via le chatbot
+def get_chatbot_recommendations(destination):
+    prompt = f"Quelles sont les meilleures attractions et restaurants à {destination}?"
+    response = chat.send_message(prompt)
+    return response.text
+
+# Fonction pour afficher les recommandations
+def display_recommendations(destination):
+    recommendations = get_chatbot_recommendations(destination)
+    st.subheader(f"Recommandations pour {destination}")
+    st.write(recommendations)
 
 # 🎨 Interface utilisateur
 st.title("🔎 Recherche de Vols ✈️")
@@ -133,10 +168,19 @@ def get_arrival_iata(arrival_city):
 arrival_id = get_arrival_iata(arrival_city)
 outbound_date = st.date_input("Date de départ", datetime.today().date())
 
+# Affichage des résultats de vol avant le bouton Recommandations IA
 if st.button("🔍 Rechercher les vols"):
     if departure_id and arrival_id:
         flights_data = get_flight_prices(departure_id, arrival_id, outbound_date.strftime('%Y-%m-%d'))
         if flights_data:
-            display_flights_table(flights_data)
+            display_optimal_flight(flights_data)
         else:
             st.warning("❌ Aucun vol trouvé.")
+
+# Afficher les résultats des vols précédemment enregistrés
+if "flights_df" in st.session_state:
+    st.markdown(st.session_state.flights_df.to_html(escape=False, index=False), unsafe_allow_html=True)
+
+# Bouton pour afficher les recommandations IA après le tableau de vols
+if st.button("🌟 Recommandations IA"):
+    display_recommendations(arrival_city)
