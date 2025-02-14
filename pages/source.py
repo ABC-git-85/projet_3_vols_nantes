@@ -42,7 +42,7 @@ Bienvenue sur **Projet 3 Vols Nantes**, une application qui vous permet d'explor
 #### 🔹 Recherche de vols et comparaison des prix
 - Trouvez les meilleures offres de vols au départ des aéroports français.  
 - Comparez les prix et les options de voyage.  
-- Filtrez les résultats selon vos préférences.
+- Retrouvez des recommandations faites par l'IA pour des lieux à visiter et des restaurants en fonction de votre destination.
 
 ---
 
