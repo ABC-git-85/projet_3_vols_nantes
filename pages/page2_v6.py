@@ -249,7 +249,7 @@ with col2:
     flights_sup_500_by_companies_2024_year_delays['Ratio_Retards'] = round(flights_sup_500_by_companies_2024_year_delays['Nombre_Vols_En_Retard'] / flights_sup_500_by_companies_2024_year_delays['Nombre_Total_Vols'] * 100, 2)
     flop5_flights_delays_ratio_companies = flights_sup_500_by_companies_2024_year_delays.sort_values('Ratio_Retards', ascending=False).head(5)
 
-    fig = px.bar(flop5_flights_delays_ratio_companies, x="Ratio_Retards", y="Compagnie", color='Compagnie', labels=dict(Ratio_Retards="Part des vols en retard (en % des vols totals de la compagnie)", Compagnie="Compagnie"), text_auto='.2s', orientation='h', title="✈️ En part des vols en retard...", color_discrete_sequence=px.colors.qualitative.Plotly)
+    fig = px.bar(flop5_flights_delays_ratio_companies, x="Ratio_Retards", y="Compagnie", color='Compagnie', labels=dict(Ratio_Retards="Vols en retard (en % des vols totals de la compagnie)", Compagnie="Compagnie"), text_auto='.2s', orientation='h', title="✈️ En pourcentage des vols en retard...", color_discrete_sequence=px.colors.qualitative.Plotly)
     fig.update_traces(textfont_size=14, texttemplate="%{x:,.1f} %")
     # Source
     annotations = []

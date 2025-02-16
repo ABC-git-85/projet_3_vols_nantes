@@ -46,11 +46,16 @@ api_key = 'ea7fa4-b8076f'
 def fetch_flight_data():    
     url_flights = f"https://aviation-edge.com/v2/public/flights?key={api_key}&status=en-route"
     response = requests.get(url_flights)
+    
     if response.status_code == 200:
         flights = response.json()
         return flights
+    elif response.status_code == 403:
+        st.error("La clé API est désactivée ou non valide. Veuillez vérifier la clé.")
+    elif response.status_code == 429:
+        st.error("Le nombre maximal d'appels à l'API a été atteint. Veuillez réessayer plus tard.")
     else:
-        st.error("Erreur lors de la récupération des données.")
+        st.error(f"Erreur lors de la récupération des données (Code {response.status_code}).")
     return None
 
 # WEATHER
@@ -69,7 +74,7 @@ def get_weather(city_name):
     else:
         return None
 
-###########################################################################
+################################### Fx ###################################
 
 # CARTE - Création de la carte Folium
 def create_map(flight_data, airport_coords, radius_km):
